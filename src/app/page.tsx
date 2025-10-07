@@ -138,7 +138,11 @@ export default function Home() {
                   </td>
                   <td className="table-cell">{player.age}</td>
                   <td className="table-cell">{player.position?.name}</td>
-                  <td className="table-cell">{player.club?.name}</td>
+                  <td className="table-cell">
+                    <Link className="link" href={`/${player.club.name}`}>
+                      {player.club?.name}
+                    </Link>
+                  </td>
                   <td className="table-cell">{player.country} </td>
                   {user?.role === "admin" && (
                     <td className="table-cell">

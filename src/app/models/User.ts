@@ -29,8 +29,7 @@ const userSchema = new Schema(
       ref: "Club",
       // required: true,
     },
-    firstname: { type: String, required: true },
-    lastname: { type: String, required: true },
+    name: { type: String, required: true },
 
     last_login: {
       type: Date,

@@ -11,6 +11,13 @@ const clubSchema = new Schema(
       type: String,
       required: true,
     },
+    
+    players: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Player",
+      },
+    ],
     level: { type: String },
   },
   { timestamps: true }

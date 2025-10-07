@@ -1,8 +1,9 @@
 // ClubsPage.jsx
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import { showErrorMsg } from "../_utils/Alert";
-import { ClubInterface } from "../types";
+import { showErrorMsg } from "../../_utils/Alert";
+import { ClubInterface } from "../../types";
+import Link from "next/link";
 
 const ClubsPage = () => {
   const [clubs, setClubs] = useState<ClubInterface[]>([]);
@@ -30,7 +31,11 @@ const ClubsPage = () => {
     <div className="container">
       <p className="title">CLUBS</p>
       {clubs.map((club) => (
-        <p key={club._id}>{club.name}</p>
+        <p key={club._id}>
+          <Link className="link" href={`/${club.name}`}>
+            {club.name}
+          </Link>
+        </p>
       ))}
     </div>
   );

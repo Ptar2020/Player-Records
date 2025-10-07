@@ -30,7 +30,6 @@ export interface UserInterface {
   password: string;
   password2: string;
   phone: string;
-  firstname: string;
-  lastname: string;
+  name: string;
   club: string;
 }

@@ -6,10 +6,9 @@ import { showErrorMsg } from "@/app/_utils/Alert";
 
 const Register = () => {
   const [clubs, setClubs] = useState<ClubInterface[]>([]);
-  const [userData, setUserData] = useState<UserInterface>({
+  const [userData, setUserData] = useState<Partial<UserInterface>>({
     username: "",
-    firstname: "",
-    lastname: "",
+    name: "",
     password: "",
     password2: "",
     email: "",
@@ -40,6 +39,7 @@ const Register = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
     });
+    console.log(userData);
     const data = await response.json();
     console.log(data);
   };
@@ -49,18 +49,12 @@ const Register = () => {
       <p className="form-title">USER REGISTRATION PAGE</p>
       <input
         className="input"
-        placeholder="Firstname"
+        placeholder="Name"
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          setUserData({ ...userData, firstname: e.target.value });
+          setUserData({ ...userData, name: e.target.value });
         }}
       />
-      <input
-        className="input"
-        placeholder="Lastname"
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          setUserData({ ...userData, lastname: e.target.value });
-        }}
-      />
+
       <input
         className="input"
         placeholder="Username"
@@ -85,7 +79,9 @@ const Register = () => {
           --Select Club--
         </option>
         {clubs.map((club) => (
-          <option key={club._id}>{club.name}</option>
+          <option value={club._id} key={club._id}>
+            {club.name}
+          </option>
         ))}
       </select>
       <input

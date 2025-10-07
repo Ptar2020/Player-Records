@@ -2,30 +2,39 @@ import { dbConnect } from "@/app/database/db";
 import { Position } from "@/app/models";
 import { NextRequest, NextResponse } from "next/server";
 
-// Create a position
+// Create a position (POST /api/position)
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json();
     await dbConnect();
-    await new Position(data).save();
-    return NextResponse.json({ success: "Position created" });
+    const data = await request.json();
+    if (!data.name) {
+      return NextResponse.json({ msg: "Name is required" }, { status: 400 });
+    }
+    const newPosition = new Position(data);
+    await newPosition.save();
+    return NextResponse.json({ success: "Position created" }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      error instanceof Error ? error.message : "Error creating position"
+      {
+        msg: error instanceof Error ? error.message : "Error creating position",
+      },
+      { status: 500 }
     );
   }
 }
 
-// Get available positions
+// Get available positions (GET /api/position)
 export async function GET() {
   try {
     await dbConnect();
     const positions = await Position.find();
-    console.log(positions);
     return NextResponse.json(positions);
   } catch (error) {
     return NextResponse.json(
-      error instanceof Error ? error.message : "Error getting positions"
+      {
+        msg: error instanceof Error ? error.message : "Error getting positions",
+      },
+      { status: 500 }
     );
   }
 }

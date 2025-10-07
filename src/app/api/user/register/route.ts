@@ -6,7 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 // REGISTER  a user
 export async function POST(request: NextRequest) {
   try {
-    const { username, password, firstname, lastname, email, phone, club } =
+    // await User.collection.drop();
+    // console.log(await User.find());
+    const { username, password, name, email, phone, club } =
       await request.json();
     await dbConnect();
     const checkUser = await User.findOne({ username: username });
@@ -17,8 +19,7 @@ export async function POST(request: NextRequest) {
     await new User({
       username,
       password: hashedPassword,
-      firstname,
-      lastname,
+      name,
       email,
       phone,
       club,
