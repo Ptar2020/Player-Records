@@ -4,6 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { UserInterface } from "../../types";
 import { useAuth } from "@/app/_utils/AuthProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Login = () => {
   const router = useRouter();
@@ -53,6 +54,9 @@ const Login = () => {
       <button className="btn btn-primary" onClick={loginUser}>
         LOGIN
       </button>
+      <Link href={"/register"} className="btn btn-primary">
+        REGISTER
+      </Link>
     </div>
   );
 };

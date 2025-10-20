@@ -1,5 +1,5 @@
 import { dbConnect } from "@/app/database/db";
-import { Club } from "@/app/models";
+import { Club, User } from "@/app/models";
 import { NextRequest, NextResponse } from "next/server";
 
 // CREATE a club (POST /api/club)
@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
+    // await Club.collection.drop();
+    // await User.deleteMany({ username: { $ne: "ptare" } }); //Deletes all users except one with "ptare" username
     const clubs = await Club.find();
     return NextResponse.json(clubs);
   } catch (error) {

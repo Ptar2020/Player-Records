@@ -8,13 +8,15 @@ export interface PlayerInterface {
   email: string;
   phone: string;
   photo: string;
-  position: string;
+  position: PositionInterface; // Changed from string to PositionInterface
 }
+
 export interface ClubInterface {
   _id: string;
   name: string;
   country: string;
   level: string;
+  players?: PlayerInterface[];
 }
 
 export interface PositionInterface {
