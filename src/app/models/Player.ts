@@ -23,7 +23,6 @@ const playerSchema = new Schema(
     },
     phone: {
       type: String,
-      // required: true,
     },
     email: {
       type: String,
@@ -36,7 +35,12 @@ const playerSchema = new Schema(
     club: {
       type: Schema.Types.ObjectId,
       ref: "Club",
-      // required: true,
+    },
+    jerseyNumber: {
+      type: Number,
+      min: 1,
+      max: 909,
+      sparse: true, 
     },
   },
   { timestamps: true }

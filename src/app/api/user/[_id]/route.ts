@@ -52,7 +52,7 @@ export async function DELETE(
     }
     await user.deleteOne();
     // await User.findByIdAndDelete(_id);
-    return NextResponse.json({ success: "User deleted successfully" });
+    return NextResponse.json({ success: "User deleted" });
   } catch (error) {
     return NextResponse.json(
       error instanceof Error ? error.message : "Error deleting user"

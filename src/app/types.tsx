@@ -4,11 +4,11 @@ export interface PlayerInterface {
   country: string;
   age: number;
   gender: string;
-  club: string;
+  club: ClubInterface; //string;
   email: string;
   phone: string;
   photo: string;
-  position: PositionInterface; // Changed from string to PositionInterface
+  position: PositionInterface;
 }
 
 export interface ClubInterface {
@@ -33,5 +33,5 @@ export interface UserInterface {
   password2: string;
   phone: string;
   name: string;
-  club: string;
+  club: ClubInterface | null; //string;
 }

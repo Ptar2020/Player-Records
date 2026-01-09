@@ -53,7 +53,7 @@ const ClubsPage = () => {
             <tr className="table-row" key={club._id}>
               <td className="table-cell">{index + 1}</td>
               <td className="table-cell">
-                <Link className="link " href={`/${club.name}`}>
+                <Link className="link " href={`/${club._id}`}>
                   {club.name}
                 </Link>
               </td>

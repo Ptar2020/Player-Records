@@ -1,10 +1,10 @@
+
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { PlayerInterface } from "./types";
 import Link from "next/link";
 import { showErrorMsg, showSuccessMsg } from "@/app/_utils/Alert";
-import debounce from "lodash/debounce";
 import { useAuth } from "./_utils/AuthProvider";
 import swal from "sweetalert";
 import PlayerForm from "./components/PlayerForm";
@@ -13,88 +13,90 @@ export default function Home() {
   const { user } = useAuth();
   const [addPlayer, setAddPlayer] = useState(false);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
-  const [filteredPlayers, setFilteredPlayers] = useState<PlayerInterface[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
-  const getPlayers = useCallback(async () => {
+  // Fetch all players
+  const getPlayers = async () => {
     try {
       setError(null);
-      const response = await fetch(`/api/player`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch players");
-      }
-      const data = await response.json();
-      setPlayers(data);
-      setFilteredPlayers(data);
-    } catch (error) {
-      setError("Failed to fetch players");
-      showErrorMsg("Failed to fetch players");
-    }
-  }, []);
-
-  const deletePlayer = useCallback(
-    async (_id: string, name: string) => {
-      const confirmed = await swal({
-        title: `Sure to delete ${name} records`,
-        icon: "warning",
-        buttons: ["Cancel", "Delete"],
-        dangerMode: true,
+      const response = await fetch("/api/player", {
+        credentials: "include",
       });
 
-      if (confirmed) {
-        try {
-          const response = await fetch(`/api/player/${_id}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          });
-          const data = await response.json();
+      if (!response.ok) throw new Error("Failed to fetch players");
 
-          if (!response.ok) {
-            showErrorMsg(data.msg || "Failed to delete player");
-            return;
-          }
-          showSuccessMsg(`${name} deleted successfully`);
-          await getPlayers();
-        } catch (error) {
-          showErrorMsg("Failed to delete player");
-          setError("Failed to delete player");
-        }
+      const data: PlayerInterface[] = await response.json();
+      setPlayers(data);
+    } catch (err) {
+      const msg = "Failed to fetch players";
+      setError(msg);
+      showErrorMsg(msg);
+    }
+  };
+
+  // Delete player
+  const deletePlayer = async (_id: string, name: string) => {
+    const confirmed = await swal({
+      title: `Delete ${name}?`,
+      text: "This action cannot be undone!",
+      icon: "warning",
+      buttons: ["Cancel", "Delete"],
+      dangerMode: true,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/player/${_id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        showErrorMsg(data.msg || "Failed to delete player");
+        return;
       }
-    },
-    [getPlayers]
-  );
 
-  // Debounced search handler
-  const handleSearch = useCallback(
-    debounce((value: string) => {
-      const filtered = players.filter((player) =>
-        player.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredPlayers(filtered);
-    }, 300),
-    [players]
-  );
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    handleSearch(e.target.value);
+      showSuccessMsg(`${name} deleted successfully`);
+      await getPlayers(); // Refresh the list
+    } catch (err) {
+      showErrorMsg("Failed to delete player");
+    }
   };
 
-  const toggleAddPlayer = async () => {
-    setAddPlayer(!addPlayer);
+  // Instant client-side filtering — fast and responsive
+  const filteredPlayers = useMemo(() => {
+    if (!searchTerm.trim()) return players;
+
+    const term = searchTerm.toLowerCase();
+    return players.filter((player) =>
+      player.name.toLowerCase().includes(term)
+    );
+  }, [players, searchTerm]);
+
+  const toggleAddPlayer = () => {
+    setAddPlayer((prev) => !prev);
   };
+
+  // Called by PlayerForm after successful add
+  const handlePlayerAdded = () => {
+    showSuccessMsg("Player added successfully!");
+    getPlayers(); // Refresh list
+    setAddPlayer(false); // Close form
+  };
+
+  // Attach PlayerForm's success handler (assuming it accepts onSuccess prop)
+  // If your PlayerForm doesn't have onSuccess yet, add it there and call it on success.
+
   useEffect(() => {
     getPlayers();
-    return () => {
-      handleSearch.cancel();
-    };
-  }, [getPlayers]);
+  }, []);
 
   if (error) {
     return (
-      <div className="error-text" role="alert">
+      <div className="text-center text-red-600 text-xl mt-20" role="alert">
         Error: {error}
       </div>
     );
@@ -103,22 +105,26 @@ export default function Home() {
   return (
     <div className="container max-w-4xl">
       <h1 className="title">PLAYERS RECORDS</h1>
+
       {user && (
         <button className="btn" onClick={toggleAddPlayer}>
           {addPlayer ? "Close" : "Add Player"}
         </button>
       )}
+
       <div className="mb-4">
         <input
           className="input"
           type="text"
           placeholder="Search by player name"
           value={searchTerm}
-          onChange={handleInputChange}
+          onChange={(e) => setSearchTerm(e.target.value)}
           aria-label="Search players by name"
         />
       </div>
-      {addPlayer && <PlayerForm />}
+
+      {addPlayer && <PlayerForm onSuccess={handlePlayerAdded} />}
+
       {filteredPlayers.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="table">
@@ -127,12 +133,12 @@ export default function Home() {
                 <th className="table-header">#</th>
                 <th className="table-header">Name</th>
                 <th className="table-header">Age</th>
-                <th className="table-header">Position</th>{" "}
+                <th className="table-header">Position</th>
                 <th className="table-header">Club</th>
                 <th className="table-header">Country</th>
                 {user?.role === "admin" && (
                   <th className="table-header">Action</th>
-                )}{" "}
+                )}
               </tr>
             </thead>
             <tbody>
@@ -147,11 +153,11 @@ export default function Home() {
                   <td className="table-cell">{player.age}</td>
                   <td className="table-cell">{player.position?.name}</td>
                   <td className="table-cell">
-                    <Link className="link" href={`/${player.club.name}`}>
+                    <Link className="link" href={`/${player.club?._id}`}>
                       {player.club?.name}
                     </Link>
                   </td>
-                  <td className="table-cell">{player.country} </td>
+                  <td className="table-cell">{player.country}</td>
                   {user?.role === "admin" && (
                     <td className="table-cell">
                       <button

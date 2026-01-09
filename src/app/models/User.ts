@@ -5,7 +5,7 @@ const userSchema = new Schema(
     username: {
       type: String,
       unique: true,
-      required: true,
+      required: true,trim:true,
     },
     password: {
       type: String,
@@ -18,6 +18,8 @@ const userSchema = new Schema(
       type: String,
       unique: true,
       required: true,
+      lowercase:true, 
+      trim:true
     },
     role: {
       type: String,
@@ -27,7 +29,6 @@ const userSchema = new Schema(
     club: {
       type: Schema.Types.ObjectId,
       ref: "Club",
-      // required: true,
     },
     name: { type: String, required: true },
 

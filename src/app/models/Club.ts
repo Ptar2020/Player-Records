@@ -18,7 +18,9 @@ const clubSchema = new Schema(
         ref: "Player",
       },
     ],
+    logo: { type: String },
     level: { type: String },
+
   },
   { timestamps: true }
 );
